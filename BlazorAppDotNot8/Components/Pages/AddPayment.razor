@@ -1,0 +1,17 @@
+@page "/AddPayment/{BillId:long}"
+<h3>Tilføj betaling</h3>
+
+<table>
+    
+<thead></thead>
+<tbody>
+<tr>
+    <td>Amount</td>
+    <td>@Bill?.Amount</td>
+</tr>
+</tbody>
+</table>
+@code {
+    [Parameter]
+    public long BillId { get; set; }
+}

@@ -1,0 +1,75 @@
+@page "/Initialize"
+@rendermode InteractiveServer
+@using BlazorAppDotNot8.Data
+@using BlazorAppDotNot8.Services
+<h3>Initialize</h3>
+@inject UserService UserService
+@inject BillService BillService
+
+<button class="btn btn-primary" @onclick="AddUsers">Add users</button>
+<button class="btn btn-primary" @onclick="AddBills">Add bills</button>
+<br/>
+@_result
+
+<table class="table custom-table">
+<tbody>
+    @foreach (var user in _users)
+    {
+        
+        <tr>
+            
+            <td>
+                @user.Address
+            </td>
+            <td>
+                <NavLink href="@($"/login/{Uri.EscapeDataString(user.Token)}")" class="nav-link" activeClass="active">
+                    @user.Token
+                </NavLink>
+            </td>
+            <td>
+                @user.Active
+            </td>
+            <td>
+                <button class="btn btn-primary" @onclick="() => ToggleActive(user)">
+                    Toggle Active
+                </button>
+            </td>
+        </tr>
+
+        }
+        </tbody>
+</table>
+
+@code {
+
+    string _result; 
+   private List<ApplicationUser> _users;
+
+
+    public void AddUsers()
+    {
+        UserService.AddTestUsers();
+        _result = "Users added";    
+        _users = UserService.GetUsers();
+        StateHasChanged();
+    }
+
+    public async Task AddBills()
+    {
+        await BillService.AddBills();
+        _result = "Bills added";
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Load from database asynchronously
+        _users = UserService.GetUsers();
+    }
+
+    protected async Task ToggleActive(ApplicationUser user)
+    {
+        user.Active = !user.Active;
+        await UserService.UpdateUserAsync(user);
+        _users = UserService.GetUsers();
+    }
+}

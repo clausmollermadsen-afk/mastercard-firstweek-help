@@ -1,0 +1,79 @@
+@page "/Bill"
+
+@using BlazorAppDotNot8.Data
+@using BlazorAppDotNot8.Services
+@using Microsoft.AspNetCore.Authorization
+@rendermode InteractiveServer
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Nav
+@inject BillService BillService
+@inject CurrentUser CurrentUser
+@attribute [Authorize] 
+
+<h1>Regninger</h1>
+
+<h3>Medlem</h3>
+<table class="table custom-table">
+
+    <thead>
+    
+    <tr>
+        <th>Addresse</th>
+        <th>Email</th>
+        <th>Aktivt medlem</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            @_user.Address
+        </td>
+        <td>
+            @_user.Email
+        </td>
+        <td>
+            @_user.Active
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+ 
+<h3>Regninger</h3>
+<table class="table custom-table">
+    <thead>
+    <tr>
+        <th>Fra</th>
+        <th>Til</th>
+        <th>Beløb</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var bill in _bills)
+    {
+        <tr>
+            <td>@bill.FromDate.Date</td>
+
+            <td>@bill.ToDate.Date</td>
+
+            <td>@bill.Amount</td>
+            <td>
+                <NavLink href="@($"/addpayment/{@bill.Id}")" class="nav-link" activeClass="active">
+                    Tilføj betaling
+                </NavLink>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@code {
+    private ApplicationUser? _user;
+    private List<Data.Bill> _bills;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await CurrentUser.GetUser();
+        _bills = await BillService.GetBills();
+    }
+}
